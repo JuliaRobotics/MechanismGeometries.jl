@@ -11,7 +11,15 @@ using CoordinateTransformations: AffineMap, Transformation,
                                  IdentityTransformation, 
                                  LinearMap, Translation
 
-export create_skeleton, VisualElement, parse_urdf_visuals
+export AbstractGeometrySource, 
+       VisualElement,
+       visual_elements,
+       Skeleton,
+       URDFVisuals
+
+abstract type AbstractGeometrySource end
+
+function visual_elements(mechanism, source::AbstractGeometrySource) end
 
 const GeometryLike = Union{AbstractGeometry, AbstractMesh}
 const DEFAULT_COLOR = RGBA{Float32}(0.7, 0.7, 0.7, 1.0)

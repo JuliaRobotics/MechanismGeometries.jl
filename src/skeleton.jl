@@ -85,7 +85,13 @@ function maximum_link_length(body_fixed_joint_frames::Dict{RigidBody{T}, Vector{
     result
 end
 
-function create_skeleton(mechanism; show_inertias::Bool=false)
+struct Skeleton <: AbstractGeometrySource
+    inertias::Bool
+end
+
+Skeleton(; inertias=true) = Skeleton(inertias)
+
+function visual_elements(mechanism::Mechanism, source::Skeleton)
     body_fixed_joint_frames = Dict(body => begin
         [map(frame_before, out_joints(body, mechanism)); map(frame_after, in_joints(body, mechanism))]
     end for body in bodies(mechanism))
@@ -94,7 +100,7 @@ function create_skeleton(mechanism; show_inertias::Bool=false)
     elements = Vector{VisualElement}()
 
     for body in bodies(mechanism)
-        if show_inertias && has_defined_inertia(body) && spatial_inertia(body).mass >= 1e-3
+        if source.inertias && has_defined_inertia(body) && spatial_inertia(body).mass >= 1e-3
             push!(elements, inertial_ellipsoid(body))
         else
             for joint in out_joints(body, mechanism)

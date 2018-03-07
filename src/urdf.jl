@@ -6,12 +6,12 @@ using RigidBodyDynamics.Graphs
 const rbd = RigidBodyDynamics
 using ColorTypes: RGBA
 using GeometryTypes
-using MechanismGeometries: VisualElement, DEFAULT_COLOR
+import MechanismGeometries: VisualElement, DEFAULT_COLOR, AbstractGeometrySource, visual_elements
 using CoordinateTransformations: AffineMap
 using MeshIO
 using FileIO: load
 
-export parse_urdf_visuals
+export URDFVisuals
 
 function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
     geometries = Union{AbstractGeometry, AbstractMesh}[]
@@ -119,10 +119,18 @@ end
 
 ros_package_path() = split(get(ENV, "ROS_PACKAGE_PATH", ""), ':')
 
-function parse_urdf_visuals(filename, mechanism;
-            package_path=ros_package_path(), file_path="", tag="visual")
-    xdoc = parse_file(filename)
-    xroot = LightXML.root(xdoc)
+struct URDFVisuals <: AbstractGeometrySource
+    xdoc::XMLDocument
+    package_path::Vector{String}
+    file_path::String
+    tag::String
+end
+
+URDFVisuals(xdoc::XMLDocument; package_path=ros_package_path(), file_path="", tag="visual") = URDFVisuals(xdoc, package_path, file_path, tag)
+URDFVisuals(filename::AbstractString; kw...) = URDFVisuals(parse_file(filename); kw...)
+
+function visual_elements(mechanism::Mechanism, source::URDFVisuals)
+    xroot = LightXML.root(source.xdoc)
     @assert LightXML.name(xroot) == "robot"
 
     xml_links = get_elements_by_tagname(xroot, "link")
@@ -155,7 +163,7 @@ function parse_urdf_visuals(filename, mechanism;
         end
         body_frame = name_to_frame[framename]
 
-        for (geometry, color, tform) in parse_link!(material_colors, xml_link, package_path, file_path, tag)
+        for (geometry, color, tform) in parse_link!(material_colors, xml_link, source.package_path, source.file_path, source.tag)
             push!(elements, VisualElement(body_frame, geometry, color, tform))
         end
     end
