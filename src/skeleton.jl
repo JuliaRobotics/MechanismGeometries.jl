@@ -1,3 +1,5 @@
+to_affine_map(tform::Transform3D) = AffineMap(rotation(tform), translation(tform))
+
 rotation_from_x_axis(translation::AbstractVector{T}) where {T} = rotation_between(SVector{3, T}(1,0,0), translation)
 
 function inertial_ellipsoid_dimensions(mass, axis_inertias)
@@ -56,16 +58,20 @@ function inertial_ellipsoid(inertia::SpatialInertia)
     geometry = HyperSphere(zero(Point{3, Float64}), 1.0)
     scaling = LinearMap(SDiagonal(radii[1], radii[2], radii[3]))
     tform = AffineMap(RotMatrix{3}(axes), center_of_mass(inertia).v) ∘ scaling
-    return VisualElement(inertia.frame, geometry, tform)
+    return VisualElement(inertia.frame, geometry, DEFAULT_COLOR, tform)
 end
 
 function create_frame_to_frame_geometry(joint_to_joint, radius)
     trans = translation(joint_to_joint)
     geom_length = norm(trans)
-    Rx = rotation_from_x_axis(trans)
-    tform = LinearMap(Rx)
+    radius = min(radius, geom_length)
+    tform = if norm(trans) > 1e-10
+        LinearMap(rotation_from_x_axis(trans))
+    else
+        IdentityTransformation()
+    end
     geometry = HyperRectangle(Vec(0, -radius, -radius), Vec(geom_length, 2*radius, 2*radius))
-    return VisualElement(joint_to_joint.to, geometry, tform)
+    return VisualElement(joint_to_joint.to, geometry, DEFAULT_COLOR, tform)
 end
 
 function maximum_link_length(body_fixed_joint_frames::Dict{RigidBody{T}, Vector{CartesianFrame3D}}) where T
@@ -95,6 +101,7 @@ function create_skeleton(mechanism; show_inertias::Bool=false)
                 push!(elements, VisualElement(
                     frame_before(joint),
                     HyperSphere{3, Float64}(zero(Point{3, Float64}), box_width),
+                    DEFAULT_COLOR, 
                     IdentityTransformation()
                 ))
             end
@@ -104,13 +111,10 @@ function create_skeleton(mechanism; show_inertias::Bool=false)
             for j = i + 1 : length(frames)
                 framej = frames[j]
                 joint_to_joint = fixed_transform(mechanism, framei, framej)
-                trans = translation(joint_to_joint)
-                if norm(trans) > 1e-10
-                    push!(elements, create_frame_to_frame_geometry(
-                        joint_to_joint,
-                        box_width / 2
-                    ))
-                end
+                push!(elements, create_frame_to_frame_geometry(
+                    joint_to_joint,
+                    box_width / 2
+                ))
             end
         end
     end
