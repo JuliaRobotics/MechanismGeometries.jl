@@ -101,6 +101,40 @@ homog(t::Translation) = homog(AffineMap(eye(3), t.v))
             @test element.color == RGBA(0, 0, 1, 1)
             @test homog(element.transform) ≈ homog(Translation(0, 0, -1))
         end
+
+        @testset "acrobot with fixed elbow" begin
+            urdf = "urdf/Acrobot_fixed.urdf"
+            robot = parse_urdf(Float64, urdf)
+            rbd.remove_fixed_tree_joints!(robot)
+            elements = visual_elements(robot, URDFVisuals(urdf))
+            @test length(elements) == 3
+
+            element = elements[1]
+            @test string(rbd.body_fixed_frame_to_body(robot, element.frame)) == "world"
+            @test element.geometry isa HyperRectangle
+            @test element.geometry.origin ≈ [-0.1, -0.1, -0.1]
+            @test element.geometry.widths ≈ [0.2, 0.2, 0.2]
+            @test element.color == RGBA(0, 1, 0, 1)
+            @test homog(element.transform) ≈ homog(IdentityTransformation())
+
+            element = elements[2]
+            @test string(rbd.body_fixed_frame_to_body(robot, element.frame)) == "upper_link"
+            @test element.geometry isa Cylinder
+            @test element.geometry.origin ≈ [0, 0, -1.1 / 2]
+            @test element.geometry.extremity ≈ [0, 0, 1.1]
+            @test radius(element.geometry) ≈ 0.05
+            @test element.color == RGBA(1, 0, 0, 1)
+            @test homog(element.transform) ≈ homog(Translation(0, 0, -0.5))
+
+            element = elements[3]
+            @test string(rbd.body_fixed_frame_to_body(robot, element.frame)) == "upper_link"
+            @test element.geometry isa Cylinder
+            @test element.geometry.origin ≈ [0, 0, -2.1 / 2]
+            @test element.geometry.extremity ≈ [0, 0, 2.1]
+            @test radius(element.geometry) ≈ 0.05
+            @test element.color == RGBA(0, 0, 1, 1)
+            @test homog(element.transform) ≈ homog(Translation(0, 0, -1))
+        end
     end
 
 end
