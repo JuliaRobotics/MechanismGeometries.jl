@@ -5,6 +5,7 @@ using GeometryTypes
 using StaticArrays: SVector, SDiagonal
 using CoordinateTransformations: AffineMap, IdentityTransformation, LinearMap, Translation
 using ColorTypes: RGBA
+using ValkyrieRobot
 using Base.Test
 
 function homog(::IdentityTransformation)
@@ -135,6 +136,13 @@ homog(t::Translation) = homog(AffineMap(eye(3), t.v))
             @test element.color == RGBA(0, 0, 1, 1)
             @test homog(element.transform) ≈ homog(Translation(0, 0, -1))
         end
+    end
+
+    @testset "valkyrie" begin
+        robot = ValkyrieRobot.Valkyrie().mechanism
+        visual_elements(robot, Skeleton())
+        visual_elements(robot, Skeleton(inertias=false))
+        visual_elements(robot, URDFVisuals(ValkyrieRobot.urdfpath(), package_path=[ValkyrieRobot.packagepath()]))
     end
 
 end
