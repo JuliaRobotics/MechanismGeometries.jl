@@ -1,9 +1,9 @@
 # MechanismGeometries
 
-[![Build Status](https://travis-ci.org/rdeits/MechanismGeometries.jl.svg?branch=master)](https://travis-ci.org/rdeits/MechanismGeometries.jl) 
-[![codecov.io](http://codecov.io/github/rdeits/MechanismGeometries.jl/coverage.svg?branch=master)](http://codecov.io/github/rdeits/MechanismGeometries.jl?branch=master)
+[![Build Status](https://travis-ci.org/JuliaRobotics/MechanismGeometries.jl.svg?branch=master)](https://travis-ci.org/JuliaRobotics/MechanismGeometries.jl) 
+[![codecov.io](http://codecov.io/github/JuliaRobotics/MechanismGeometries.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaRobotics/MechanismGeometries.jl?branch=master)
 
-This package implements several methods of generating or loading geometries associated with a [RigidBodyDynamics.jl](https://github.com/tkoolen/RigidBodyDynamics.jl) `Mechanism` in Julia. It is currently used by [MeshCatMechanisms.jl](https://github.com/rdeits/MeshCatMechanisms.jl) but can also be used independently. 
+This package implements several methods of generating or loading geometries associated with a [RigidBodyDynamics.jl](https://github.com/tkoolen/RigidBodyDynamics.jl) `Mechanism` in Julia. It is currently used by [MeshCatMechanisms.jl](https://github.com/JuliaRobotics/MeshCatMechanisms.jl) but can also be used independently. 
 
 # Interface
 
