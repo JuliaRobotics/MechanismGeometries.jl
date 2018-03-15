@@ -87,9 +87,10 @@ end
 
 struct Skeleton <: AbstractGeometrySource
     inertias::Bool
+    randomize_colors::Bool
 end
 
-Skeleton(; inertias=true) = Skeleton(inertias)
+Skeleton(; inertias=true, randomize_colors=false) = Skeleton(inertias, randomize_colors)
 
 function visual_elements(mechanism::Mechanism, source::Skeleton)
     body_fixed_joint_frames = Dict(body => begin
@@ -122,6 +123,11 @@ function visual_elements(mechanism::Mechanism, source::Skeleton)
                     box_width / 2
                 ))
             end
+        end
+    end
+    if source.randomize_colors
+        for element in elements
+            element.color = RGBA{Float32}(rand(), rand(), rand(), 0.5)
         end
     end
     elements
