@@ -136,6 +136,16 @@ homog(t::Translation) = homog(AffineMap(eye(3), t.v))
             @test element.color == RGBA(0, 0, 1, 1)
             @test homog(element.transform) ≈ homog(Translation(0, 0, -1))
         end
+
+        @testset "acrobot submechanism" begin
+            urdf = "urdf/Acrobot.urdf"
+            robot = parse_urdf(Float64, urdf)
+            s, _ = submechanism(robot, bodies(robot)[3])
+            elements = visual_elements(s, URDFVisuals(urdf))
+            @test length(elements) == 2
+            @test string(rbd.body_fixed_frame_to_body(robot, elements[1].frame)) == "upper_link" 
+            @test string(rbd.body_fixed_frame_to_body(robot, elements[2].frame)) == "lower_link" 
+        end
     end
 
     @testset "valkyrie" begin
