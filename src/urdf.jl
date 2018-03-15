@@ -162,10 +162,11 @@ function visual_elements(mechanism::Mechanism, source::URDFVisuals)
             jointname = attribute(xml_joint, "name")
             string("after_", jointname) # TODO: create function in RBD, call it here
         end
-        body_frame = name_to_frame[framename]
-
-        for (geometry, color, tform) in parse_link!(material_colors, xml_link, source.package_path, source.file_path, source.tag)
-            push!(elements, VisualElement(body_frame, geometry, color, tform))
+        if haskey(name_to_frame, framename)
+            body_frame = name_to_frame[framename]
+            for (geometry, color, tform) in parse_link!(material_colors, xml_link, source.package_path, source.file_path, source.tag)
+                push!(elements, VisualElement(body_frame, geometry, color, tform))
+            end
         end
     end
     elements
