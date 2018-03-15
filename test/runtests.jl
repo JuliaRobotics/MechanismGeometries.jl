@@ -141,7 +141,7 @@ homog(t::Translation) = homog(AffineMap(eye(3), t.v))
     @testset "valkyrie" begin
         robot = ValkyrieRobot.Valkyrie().mechanism
         visual_elements(robot, Skeleton())
-        visual_elements(robot, Skeleton(inertias=false))
+        visual_elements(robot, Skeleton(inertias=false, randomize_colors=true))
         visual_elements(robot, URDFVisuals(ValkyrieRobot.urdfpath(), package_path=[ValkyrieRobot.packagepath()]))
     end
 
