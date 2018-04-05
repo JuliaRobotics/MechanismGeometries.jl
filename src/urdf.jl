@@ -6,7 +6,8 @@ using RigidBodyDynamics.Graphs
 const rbd = RigidBodyDynamics
 using ColorTypes: RGBA
 using GeometryTypes
-import MechanismGeometries: VisualElement, DEFAULT_COLOR, AbstractGeometrySource, visual_elements
+using MechanismGeometries: VisualElement, DEFAULT_COLOR, AbstractGeometrySource, HyperPlane
+import MechanismGeometries: visual_elements
 using CoordinateTransformations: AffineMap
 using MeshIO
 using FileIO: load
@@ -28,6 +29,10 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
     for xml_sphere in get_elements_by_tagname(xml_geometry, "sphere")
         radius = rbd.parse_scalar(Float32, xml_sphere, "radius")
         push!(geometries, HyperSphere(zero(Point{3, Float32}), radius))
+    end
+    for xml_plane in get_elements_by_tagname(xml_geometry, "plane")
+        normal = Vec{3, Float32}(rbd.parse_vector(Float32, xml_plane, "normal", "0 0 1"))
+        push!(geometries, HyperPlane(normal))
     end
     for xml_mesh in get_elements_by_tagname(xml_geometry, "mesh")
         filename = attribute(xml_mesh, "filename")

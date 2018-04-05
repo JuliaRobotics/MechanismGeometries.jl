@@ -146,6 +146,18 @@ homog(t::Translation) = homog(AffineMap(eye(3), t.v))
             @test string(rbd.body_fixed_frame_to_body(robot, elements[1].frame)) == "upper_link" 
             @test string(rbd.body_fixed_frame_to_body(robot, elements[2].frame)) == "lower_link" 
         end
+
+        @testset "ground plane" begin
+            urdf = "urdf/ground_plane.urdf"
+            robot = parse_urdf(Float64, urdf)
+            elements = visual_elements(robot, URDFVisuals(urdf; tag="collision"))
+            @test length(elements) == 2
+            @test elements[1].frame === elements[2].frame
+            @test elements[1].geometry isa HyperRectangle
+            @test elements[2].geometry isa HyperPlane
+            @test elements[2].geometry.normal == Vec(0., 0, 1)
+            @test homog(elements[2].transform) ≈ homog(Translation(0, 0, 0.025))
+        end
     end
 
     @testset "valkyrie" begin
