@@ -15,6 +15,7 @@ export AbstractGeometrySource,
        VisualElement,
        visual_elements,
        Skeleton,
+       HyperPlane,
        URDFVisuals
 
 abstract type AbstractGeometrySource end
@@ -23,6 +24,10 @@ function visual_elements(mechanism, source::AbstractGeometrySource) end
 
 const GeometryLike = Union{AbstractGeometry, AbstractMesh}
 const DEFAULT_COLOR = RGBA{Float32}(0.7, 0.7, 0.7, 1.0)
+
+struct HyperPlane{N, T} <: GeometryPrimitive{N, T}
+    normal::Vec{N, T}
+end
 
 mutable struct VisualElement{G <: GeometryLike, T <: Transformation}
     frame::CartesianFrame3D
