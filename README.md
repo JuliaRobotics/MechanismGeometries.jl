@@ -20,7 +20,7 @@ visual_elements(mechanism::Mechanism, source::AbstractGeometrySource)
 * `color`: an RGBA color from [ColorTypes.jl](https://github.com/JuliaGraphics/ColorTypes.jl)
 * `transform`: a `Transformation` from [CoordinateTransformations.jl](https://github.com/FugroRoames/CoordinateTransformations.jl/) indicating the pose of the geometry w.r.t its attached frame.
 
-## Currently implemented sources
+# Currently implemented sources
 
 These demonstrations use the Boston Dynamics Atlas robot from [AtlasRobot.jl](https://github.com/tkoolen/AtlasRobot.jl).
 
@@ -31,7 +31,7 @@ mechanism = AtlasRobot.mechanism()
 ```
 
 
-### Skeleton
+## Skeleton
 
 ```julia
 Skeleton <: AbstractGeometrySource
@@ -53,7 +53,7 @@ visual_elements(mechanism, Skeleton(inertias=false))
 
 ![skeleton_no_inertias](https://user-images.githubusercontent.com/591886/37125810-1ac0f4c4-223c-11e8-845a-cf17893eba93.png)
 
-### URDF Visuals
+## URDF Visuals
 
 ```julia
 URDFVisuals <: AbstractGeometrySource
@@ -69,7 +69,11 @@ visual_elements(mechanism,
 
 ![urdf_visuals](https://user-images.githubusercontent.com/591886/37125819-1de2441e-223c-11e8-9db2-87f814cfea63.png)
 
+### URDF Extensions
 
+The following extensions to the URDF spec are parsed by MechanismGeometries.jl:
+
+* `<plane normal="0 0 1"/>`: Represents an infinite plane perpendicular to the `normal` given as an x y z unit vector. Returns a MechanismGeometries.HyperPlane
 
 
 
