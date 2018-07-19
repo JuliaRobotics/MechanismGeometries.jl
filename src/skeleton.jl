@@ -105,12 +105,14 @@ function visual_elements(mechanism::Mechanism, source::Skeleton)
             push!(elements, inertial_ellipsoid(body))
         else
             for joint in out_joints(body, mechanism)
-                push!(elements, VisualElement(
-                    frame_before(joint),
-                    HyperSphere{3, Float64}(zero(Point{3, Float64}), box_width),
-                    DEFAULT_COLOR, 
-                    IdentityTransformation()
-                ))
+                if !iszero(box_width)
+                    push!(elements, VisualElement(
+                        frame_before(joint),
+                        HyperSphere{3, Float64}(zero(Point{3, Float64}), box_width),
+                        DEFAULT_COLOR,
+                        IdentityTransformation()
+                    ))
+                end
             end
         end
         frames = body_fixed_joint_frames[body]
