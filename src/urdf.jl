@@ -114,7 +114,7 @@ function create_graph(xml_links, xml_joints)
     for vertex in vertices
         add_vertex!(graph, vertex)
     end
-    name_to_vertex = Dict(attribute(data(v), "name") => v for v in vertices)
+    name_to_vertex = Dict(attribute(v.data, "name") => v for v in vertices)
     for xml_joint in xml_joints
         parent = name_to_vertex[attribute(find_element(xml_joint, "parent"), "link")]
         child = name_to_vertex[attribute(find_element(xml_joint, "child"), "link")]
@@ -157,13 +157,13 @@ function visual_elements(mechanism::Mechanism, source::URDFVisuals)
 
     elements = Vector{VisualElement}()
     for vertex in rbd.Graphs.vertices(tree) 
-        xml_link = data(vertex)
+        xml_link = vertex.data
 
         linkname = attribute(xml_link, "name")
         framename = if vertex == rbd.Graphs.root(tree)
             linkname
         else
-            xml_joint = data(edge_to_parent(vertex, tree))
+            xml_joint = edge_to_parent(vertex, tree).data
             jointname = attribute(xml_joint, "name")
             string("after_", jointname) # TODO: create function in RBD, call it here
         end
