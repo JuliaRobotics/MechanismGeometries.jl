@@ -1,17 +1,18 @@
-__precompile__(true)
+VERSION < v"0.7.0-beta2.199" && __precompile__()
 
 module MechanismGeometries
 
+using Compat.LinearAlgebra
 using GeometryTypes
 using StaticArrays
 using RigidBodyDynamics
 using ColorTypes: RGBA
 using Rotations: rotation_between, RotMatrix, AngleAxis
-using CoordinateTransformations: AffineMap, Transformation, 
-                                 IdentityTransformation, 
+using CoordinateTransformations: AffineMap, Transformation,
+                                 IdentityTransformation,
                                  LinearMap, Translation
 
-export AbstractGeometrySource, 
+export AbstractGeometrySource,
        VisualElement,
        visual_elements,
        Skeleton,
