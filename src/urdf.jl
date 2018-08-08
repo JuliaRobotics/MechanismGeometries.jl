@@ -105,7 +105,7 @@ function parse_link!(material_colors::Dict, xml_link,
             geometry, color, tform
         end
     end
-    reduce(vcat, visual_groups, init=[])
+    Compat.reduce(vcat, visual_groups, init=[])
 end
 
 function create_graph(xml_links, xml_joints)
