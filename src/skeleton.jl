@@ -46,11 +46,17 @@ end
 
 inertial_ellipsoid(body::RigidBody) = inertial_ellipsoid(spatial_inertia(body))
 
+if VERSION < v"0.7.0-DEV.5211"
+    const _eigen = eig
+else
+    const _eigen = eigen
+end
+
 function inertial_ellipsoid(inertia::SpatialInertia)
     com_frame = CartesianFrame3D("CoM")
     com_frame_to_inertia_frame = Transform3D(com_frame, inertia.frame, center_of_mass(inertia).v)
     com_inertia = transform(inertia, inv(com_frame_to_inertia_frame))
-    principal_inertias, axes = eig(Array(com_inertia.moment)) # StaticArrays.eig checks that the matrix is Hermitian with zero tolerance...
+    principal_inertias, axes = _eigen(Array(com_inertia.moment)) # StaticArrays.eig checks that the matrix is Hermitian with zero tolerance...
     axes[:,3] *= sign(dot(cross(axes[:,1], axes[:,2]), axes[:,3])) # Ensure the axes form a right-handed coordinate system
     radii = inertial_ellipsoid_dimensions(com_inertia.mass, principal_inertias)
     # We create an ellipsoid by generating a sphere and then scaling it

@@ -11,6 +11,7 @@ import MechanismGeometries: visual_elements
 using CoordinateTransformations: AffineMap
 using MeshIO
 using FileIO: load
+using Compat
 
 export URDFVisuals
 
@@ -38,16 +39,16 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
         filename = attribute(xml_mesh, "filename")
         dae_pattern = r".dae$"
         replaced_extension_with_obj = false
-        if ismatch(dae_pattern, filename)
-            filename = replace(filename, dae_pattern, ".obj")
+        if occursin(dae_pattern, filename)
+            filename = replace(filename, dae_pattern => ".obj")
             replaced_extension_with_obj = true
         end
         package_pattern = r"^package://"
 
-        if ismatch(package_pattern, filename)
+        if occursin(package_pattern, filename)
             found_mesh = false
             for package_directory in package_path
-                filename_in_package = joinpath(package_directory, replace(filename, package_pattern, ""))
+                filename_in_package = joinpath(package_directory, replace(filename, package_pattern => ""))
                 if ispath(filename_in_package)
                     mesh = load(filename_in_package, GLUVMesh)
                     push!(geometries, mesh)
@@ -104,7 +105,7 @@ function parse_link!(material_colors::Dict, xml_link,
             geometry, color, tform
         end
     end
-    reduce(vcat, [], visual_groups)
+    reduce(vcat, visual_groups, init=[])
 end
 
 function create_graph(xml_links, xml_joints)
@@ -156,7 +157,7 @@ function visual_elements(mechanism::Mechanism, source::URDFVisuals)
     name_to_frame = Dict(string(tf.from) => tf.from for body in bodies(mechanism) for tf in rbd.frame_definitions(body))
 
     elements = Vector{VisualElement}()
-    for vertex in rbd.Graphs.vertices(tree) 
+    for vertex in rbd.Graphs.vertices(tree)
         xml_link = vertex.data
 
         linkname = attribute(xml_link, "name")
