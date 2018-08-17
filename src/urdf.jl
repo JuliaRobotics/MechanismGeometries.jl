@@ -39,12 +39,6 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
     end
     for xml_mesh in get_elements_by_tagname(xml_geometry, "mesh")
         filename = attribute(xml_mesh, "filename")
-        dae_pattern = r".dae$"
-        replaced_extension_with_obj = false
-        if occursin(dae_pattern, filename)
-            filename = replace(filename, dae_pattern => ".obj")
-            replaced_extension_with_obj = true
-        end
         package_pattern = r"^package://"
 
         if occursin(package_pattern, filename)
@@ -60,9 +54,6 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
             end
             if !found_mesh
                 warning_message = "Could not find the mesh file: $(filename). I tried substituting the following folders for the 'package://' prefix: $(package_path)."
-                if replaced_extension_with_obj
-                    warning_message *= " Note that I replaced the file's original extension with .obj to try to find a mesh in a format I can actually load."
-                end
                 @warn(warning_message)
             end
         else
@@ -72,9 +63,6 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
                 push!(geometries, mesh)
             else
                 warning_message = "Could not find the mesh file: $(filename)."
-                if replaced_extension_with_obj
-                    warning_message *= " Note that I replaced the file's original extension with .obj to try to find a mesh in a format I can actually load."
-                end
                 @warn(warning_message)
             end
         end
