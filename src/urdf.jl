@@ -12,6 +12,7 @@ using CoordinateTransformations: AffineMap
 using MeshIO
 using FileIO: load
 using Compat
+using Compat: @warn
 
 export URDFVisuals
 
@@ -61,7 +62,7 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
                 if replaced_extension_with_obj
                     warning_message *= " Note that I replaced the file's original extension with .obj to try to find a mesh in a format I can actually load."
                 end
-                warn(warning_message)
+                @warn(warning_message)
             end
         else
             filename = joinpath(file_path, filename)
@@ -73,7 +74,7 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
                 if replaced_extension_with_obj
                     warning_message *= " Note that I replaced the file's original extension with .obj to try to find a mesh in a format I can actually load."
                 end
-                warn(warning_message)
+                @warn(warning_message)
             end
         end
     end

@@ -160,6 +160,12 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
             @test elements[2].geometry.normal == Vec(0., 0, 1)
             @test homog(elements[2].transform) ≈ homog(Translation(0, 0, 0.025))
         end
+
+        @testset "file with missing mesh" begin
+            urdf = "urdf/missing_meshfile.urdf"
+            robot = parse_urdf(Float64, urdf)
+            elements = visual_elements(robot, URDFVisuals(urdf; tag="collision"))
+        end
     end
 
     @testset "valkyrie" begin
