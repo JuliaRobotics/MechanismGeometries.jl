@@ -12,6 +12,7 @@ using CoordinateTransformations: AffineMap
 using MeshIO
 using FileIO: load
 using Compat
+using Compat: @warn
 
 export URDFVisuals
 
