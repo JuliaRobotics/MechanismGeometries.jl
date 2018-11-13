@@ -96,17 +96,18 @@ end
 
 function parse_link!(material_colors::Dict, xml_link,
                      package_path=ros_package_path(), file_path="", tag="visual")
+    ret = []
     xml_visuals = get_elements_by_tagname(xml_link, tag)
-    visual_groups = map(xml_visuals) do xml_visual
+    for xml_visual in xml_visuals
         xml_material = find_element(xml_visual, tag)
         color = parse_material!(material_colors, find_element(xml_visual, "material"))
         rot, trans = rbd.parse_pose(Float64, find_element(xml_visual, "origin"))
         tform = AffineMap(rot, trans)
-        map(parse_geometries(find_element(xml_visual, "geometry"), package_path, file_path)) do geometry
-            geometry, color, tform
+        for geometry in parse_geometries(find_element(xml_visual, "geometry"), package_path, file_path)
+            push!(ret, (geometry, color, tform))
         end
     end
-    Compat.reduce(vcat, visual_groups, init=[])
+    ret
 end
 
 function create_graph(xml_links, xml_joints)
