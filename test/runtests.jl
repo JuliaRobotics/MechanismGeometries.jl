@@ -90,7 +90,7 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
             @test string(rbd.body_fixed_frame_to_body(robot, element.frame)) == "upper_link"
             @test element.geometry isa Cylinder
             @test element.geometry.origin ≈ [0, 0, -1.1 / 2]
-            @test element.geometry.extremity ≈ [0, 0, 1.1]
+            @test element.geometry.extremity ≈ [0, 0, 1.1 / 2]
             @test radius(element.geometry) ≈ 0.05
             @test element.color == RGBA(1, 0, 0, 1)
             @test homog(element.transform) ≈ homog(Translation(0, 0, -0.5))
@@ -99,7 +99,7 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
             @test string(rbd.body_fixed_frame_to_body(robot, element.frame)) == "lower_link"
             @test element.geometry isa Cylinder
             @test element.geometry.origin ≈ [0, 0, -2.1 / 2]
-            @test element.geometry.extremity ≈ [0, 0, 2.1]
+            @test element.geometry.extremity ≈ [0, 0, 2.1 / 2]
             @test radius(element.geometry) ≈ 0.05
             @test element.color == RGBA(0, 0, 1, 1)
             @test homog(element.transform) ≈ homog(Translation(0, 0, -1))
@@ -124,7 +124,7 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
             @test string(rbd.body_fixed_frame_to_body(robot, element.frame)) == "upper_link"
             @test element.geometry isa Cylinder
             @test element.geometry.origin ≈ [0, 0, -1.1 / 2]
-            @test element.geometry.extremity ≈ [0, 0, 1.1]
+            @test element.geometry.extremity ≈ [0, 0, 1.1 / 2]
             @test radius(element.geometry) ≈ 0.05
             @test element.color == RGBA(1, 0, 0, 1)
             @test homog(element.transform) ≈ homog(Translation(0, 0, -0.5))
@@ -133,7 +133,7 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
             @test string(rbd.body_fixed_frame_to_body(robot, element.frame)) == "upper_link"
             @test element.geometry isa Cylinder
             @test element.geometry.origin ≈ [0, 0, -2.1 / 2]
-            @test element.geometry.extremity ≈ [0, 0, 2.1]
+            @test element.geometry.extremity ≈ [0, 0, 2.1 / 2]
             @test radius(element.geometry) ≈ 0.05
             @test element.color == RGBA(0, 0, 1, 1)
             @test homog(element.transform) ≈ homog(Translation(0, 0, -1))
