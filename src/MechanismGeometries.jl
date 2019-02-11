@@ -19,6 +19,9 @@ export AbstractGeometrySource,
        HyperPlane,
        URDFVisuals
 
+# Re-export from ColorTypes
+export RGBA
+
 abstract type AbstractGeometrySource end
 
 function visual_elements(mechanism, source::AbstractGeometrySource) end
