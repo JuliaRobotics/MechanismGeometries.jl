@@ -4,7 +4,7 @@ const rbd = RigidBodyDynamics
 using GeometryTypes
 using StaticArrays: SVector, SDiagonal
 using CoordinateTransformations: AffineMap, IdentityTransformation, LinearMap, Translation, transform_deriv
-using ColorTypes: RGBA
+using ColorTypes: RGBA, BGR
 using ValkyrieRobot
 using Compat
 using Compat.Test
@@ -165,6 +165,24 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
             urdf = "urdf/missing_meshfile.urdf"
             robot = parse_urdf(Float64, urdf)
             elements = visual_elements(robot, URDFVisuals(urdf; tag="collision"))
+        end
+
+        @testset "link_colors keyword argument" begin
+            urdf = "urdf/Acrobot.urdf"
+            robot = parse_urdf(Float64, urdf)
+            link = last(bodies(robot))
+            for override_color in [RGBA(0.1f0, 0.2f0, 0.3f0, 0.4f0), BGR(0.1, 0.2, 0.3)]
+                link_colors = Dict(string(link) => override_color)
+                elements_override = visual_elements(robot, URDFVisuals(urdf; link_colors=link_colors))
+                elements_base = visual_elements(robot, URDFVisuals(urdf))
+                for (element_override, element_base) in zip(elements_override, elements_base)
+                    if element_base == last(elements_base)
+                        @test RGBA{Float32}(element_override.color) == RGBA{Float32}(override_color)
+                    else
+                        @test element_override.color == element_base.color
+                    end
+                end
+            end
         end
     end
 

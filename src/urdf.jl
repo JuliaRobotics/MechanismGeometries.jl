@@ -96,12 +96,13 @@ function parse_material!(material_colors::Dict{String, RGBA{Float32}}, xml_mater
 end
 
 function parse_link!(material_colors::Dict, xml_link,
-                     package_path=ros_package_path(), file_path="", tag="visual")
+                     package_path=ros_package_path(), file_path="", tag="visual", link_colors=Dict{String, RGBA{Float32}}())
     ret = []
     xml_visuals = get_elements_by_tagname(xml_link, tag)
     for xml_visual in xml_visuals
         xml_material = find_element(xml_visual, tag)
-        color = parse_material!(material_colors, find_element(xml_visual, "material"))
+        linkname = attribute(xml_link, "name")
+        color = get(link_colors, linkname, parse_material!(material_colors, find_element(xml_visual, "material")))
         rot, trans = rbd.parse_pose(Float64, find_element(xml_visual, "origin"))
         tform = AffineMap(rot, trans)
         for geometry in parse_geometries(find_element(xml_visual, "geometry"), package_path, file_path)
@@ -134,9 +135,13 @@ struct URDFVisuals <: AbstractGeometrySource
     package_path::Vector{String}
     file_path::String
     tag::String
+    link_colors::Dict{String, RGBA{Float32}}
 end
 
-URDFVisuals(xdoc::XMLDocument; package_path=ros_package_path(), file_path="", tag="visual") = URDFVisuals(xdoc, package_path, file_path, tag)
+function URDFVisuals(xdoc::XMLDocument; package_path=ros_package_path(), file_path="", tag="visual", link_colors=Dict{String, RGBA{Float32}}())
+    URDFVisuals(xdoc, package_path, file_path, tag, link_colors)
+end
+
 URDFVisuals(filename::AbstractString; kw...) = URDFVisuals(parse_file(filename); kw...)
 
 function visual_elements(mechanism::Mechanism, source::URDFVisuals)
@@ -173,7 +178,7 @@ function visual_elements(mechanism::Mechanism, source::URDFVisuals)
         end
         if haskey(name_to_frame, framename)
             body_frame = name_to_frame[framename]
-            for (geometry, color, tform) in parse_link!(material_colors, xml_link, source.package_path, source.file_path, source.tag)
+            for (geometry, color, tform) in parse_link!(material_colors, xml_link, source.package_path, source.file_path, source.tag, source.link_colors)
                 push!(elements, VisualElement(body_frame, geometry, color, tform))
             end
         end
