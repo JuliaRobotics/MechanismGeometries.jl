@@ -24,4 +24,6 @@ matrix:
 #script:
 #  - julia -e 'import Pkg; Pkg.clone(pwd()); Pkg.build("MechanismGeometries"); Pkg.test("MechanismGeometries"; coverage=true)'
 after_success:
-  - julia --project -e 'using Pkg; pkg"add Coverage"; using Coverage; Codecov.submit(Codecov.process_folder())'
+  - if [[ $TRAVIS_JULIA_VERSION = 1.1 ]]; then
+      julia --project -e 'using Pkg; pkg"add Coverage"; using Coverage; Codecov.submit(Codecov.process_folder())';
+    fi
