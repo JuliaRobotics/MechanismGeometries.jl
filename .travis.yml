@@ -3,9 +3,8 @@ language: julia
 os:
   - linux
 julia:
-  - 0.6
-  - 0.7
   - 1.0
+  - 1.1
   - nightly
 notifications:
   email: false
@@ -25,4 +24,4 @@ matrix:
 #script:
 #  - julia -e 'import Pkg; Pkg.clone(pwd()); Pkg.build("MechanismGeometries"); Pkg.test("MechanismGeometries"; coverage=true)'
 after_success:
-  - julia coverage.jl
+  - julia --project -e 'using Pkg; pkg"add Coverage"; using Coverage; Codecov.submit(Codecov.process_folder())'
