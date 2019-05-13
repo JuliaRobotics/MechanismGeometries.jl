@@ -6,9 +6,8 @@ using StaticArrays: SVector, SDiagonal
 using CoordinateTransformations: AffineMap, IdentityTransformation, LinearMap, Translation, transform_deriv
 using ColorTypes: RGBA, BGR
 using ValkyrieRobot
-using Compat
-using Compat.Test
-using Compat.LinearAlgebra
+using Test
+using LinearAlgebra
 
 function homog(::IdentityTransformation)
     Matrix(1.0I, 4, 4)
