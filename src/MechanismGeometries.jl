@@ -26,7 +26,12 @@ abstract type AbstractGeometrySource end
 
 function visual_elements(mechanism, source::AbstractGeometrySource) end
 
-const GeometryLike = Union{AbstractGeometry, AbstractMesh}
+struct MeshFileGeometry{S <: Union{String, Vector{UInt8}}}
+    contents::S
+    format::String
+end
+
+const GeometryLike = Union{AbstractGeometry, AbstractMesh, MeshFileGeometry}
 const DEFAULT_COLOR = RGBA{Float32}(0.7, 0.7, 0.7, 1.0)
 
 struct HyperPlane{N, T} <: GeometryPrimitive{N, T}
