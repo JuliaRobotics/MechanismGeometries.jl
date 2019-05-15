@@ -9,8 +9,6 @@ using GeometryTypes
 using MechanismGeometries: GeometryLike, VisualElement, DEFAULT_COLOR, AbstractGeometrySource, HyperPlane, MeshFile
 import MechanismGeometries: visual_elements
 using CoordinateTransformations: AffineMap
-using MeshIO
-using FileIO: load
 
 export URDFVisuals
 
