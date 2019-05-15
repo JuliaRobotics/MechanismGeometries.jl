@@ -6,7 +6,7 @@ using RigidBodyDynamics.Graphs
 const rbd = RigidBodyDynamics
 using ColorTypes: RGBA
 using GeometryTypes
-using MechanismGeometries: VisualElement, DEFAULT_COLOR, AbstractGeometrySource, HyperPlane, MeshFileGeometry
+using MechanismGeometries: GeometryLike, VisualElement, DEFAULT_COLOR, AbstractGeometrySource, HyperPlane, MeshFile
 import MechanismGeometries: visual_elements
 using CoordinateTransformations: AffineMap
 using MeshIO
@@ -15,7 +15,7 @@ using FileIO: load
 export URDFVisuals
 
 function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
-    geometries = Union{AbstractGeometry, AbstractMesh, MeshFileGeometry}[]
+    geometries = GeometryLike[]
     for xml_cylinder in get_elements_by_tagname(xml_geometry, "cylinder")
         length = rbd.parse_scalar(Float32, xml_cylinder, "length")
         radius = rbd.parse_scalar(Float32, xml_cylinder, "radius")
@@ -45,7 +45,7 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
                 for ext_to_try in [ext, ".obj"] # TODO: remove this once other packages are updated
                     filename_in_package = basename * ext_to_try
                     if isfile(filename_in_package)
-                        push!(geometries, MeshFileGeometry(basename, ext_to_try[2:end]))
+                        push!(geometries, MeshFile(filename_in_package))
                         found_mesh = true
                         break
                     end
@@ -64,13 +64,13 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
             for ext_to_try in [ext, ".obj"] # TODO: remove this once other packages are updated
                 filename = basename * ext_to_try
                 if isfile(filename)
-                    push!(geometries, MeshFileGeometry(basename, ext_to_try[2:end]))
+                    push!(geometries, MeshFile(filename))
                     found_mesh = true
                     break
                 end
             end
             if !found_mesh
-                @warn "Could not find the mesh file: $(filename)."
+                @warn "Could not find the mesh file: $(filename). Also tried changing the extension to .obj."
             end
         end
     end
