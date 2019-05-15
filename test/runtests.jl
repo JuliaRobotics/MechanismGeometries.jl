@@ -73,7 +73,7 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
     @testset "urdf" begin
         @testset "acrobot" begin
             urdf = "urdf/Acrobot.urdf"
-            robot = parse_urdf(Float64, urdf)
+            robot = parse_urdf(urdf, remove_fixed_tree_joints=false)
             elements = visual_elements(robot, URDFVisuals(urdf))
             @test length(elements) == 3
 
@@ -106,7 +106,7 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
 
         @testset "acrobot with fixed elbow" begin
             urdf = "urdf/Acrobot_fixed.urdf"
-            robot = parse_urdf(Float64, urdf)
+            robot = parse_urdf(urdf, remove_fixed_tree_joints=false)
             rbd.remove_fixed_tree_joints!(robot)
             elements = visual_elements(robot, URDFVisuals(urdf))
             @test length(elements) == 3
@@ -140,8 +140,8 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
 
         @testset "acrobot submechanism" begin
             urdf = "urdf/Acrobot.urdf"
-            robot = parse_urdf(Float64, urdf)
-            s, _ = submechanism(robot, bodies(robot)[3])
+            robot = parse_urdf(urdf, remove_fixed_tree_joints=false)
+            s = submechanism(robot, bodies(robot)[3])
             elements = visual_elements(s, URDFVisuals(urdf))
             @test length(elements) == 2
             @test string(rbd.body_fixed_frame_to_body(robot, elements[1].frame)) == "upper_link"
@@ -150,7 +150,7 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
 
         @testset "ground plane" begin
             urdf = "urdf/ground_plane.urdf"
-            robot = parse_urdf(Float64, urdf)
+            robot = parse_urdf(urdf, remove_fixed_tree_joints=false)
             elements = visual_elements(robot, URDFVisuals(urdf; tag="collision"))
             @test length(elements) == 2
             @test elements[1].frame === elements[2].frame
@@ -162,13 +162,13 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
 
         @testset "file with missing mesh" begin
             urdf = "urdf/missing_meshfile.urdf"
-            robot = parse_urdf(Float64, urdf)
+            robot = parse_urdf(urdf, remove_fixed_tree_joints=false)
             elements = visual_elements(robot, URDFVisuals(urdf; tag="collision"))
         end
 
         @testset "link_colors keyword argument" begin
             urdf = "urdf/Acrobot.urdf"
-            robot = parse_urdf(Float64, urdf)
+            robot = parse_urdf(urdf, remove_fixed_tree_joints=false)
             link = last(bodies(robot))
             for override_color in [RGBA(0.1f0, 0.2f0, 0.3f0, 0.4f0), BGR(0.1, 0.2, 0.3)]
                 link_colors = Dict(string(link) => override_color)
