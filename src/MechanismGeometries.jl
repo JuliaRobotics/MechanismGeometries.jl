@@ -17,7 +17,8 @@ export AbstractGeometrySource,
        visual_elements,
        Skeleton,
        HyperPlane,
-       URDFVisuals
+       URDFVisuals,
+       MeshFile
 
 # Re-export from ColorTypes
 export RGBA
@@ -26,7 +27,11 @@ abstract type AbstractGeometrySource end
 
 function visual_elements(mechanism, source::AbstractGeometrySource) end
 
-const GeometryLike = Union{AbstractGeometry, AbstractMesh}
+struct MeshFile
+    filename::String
+end
+
+const GeometryLike = Union{AbstractGeometry, AbstractMesh, MeshFile}
 const DEFAULT_COLOR = RGBA{Float32}(0.7, 0.7, 0.7, 1.0)
 
 struct HyperPlane{N, T} <: GeometryPrimitive{N, T}

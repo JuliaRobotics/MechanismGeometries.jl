@@ -6,16 +6,14 @@ using RigidBodyDynamics.Graphs
 const rbd = RigidBodyDynamics
 using ColorTypes: RGBA
 using GeometryTypes
-using MechanismGeometries: VisualElement, DEFAULT_COLOR, AbstractGeometrySource, HyperPlane
+using MechanismGeometries: GeometryLike, VisualElement, DEFAULT_COLOR, AbstractGeometrySource, HyperPlane, MeshFile
 import MechanismGeometries: visual_elements
 using CoordinateTransformations: AffineMap
-using MeshIO
-using FileIO: load
 
 export URDFVisuals
 
 function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
-    geometries = Union{AbstractGeometry, AbstractMesh}[]
+    geometries = GeometryLike[]
     for xml_cylinder in get_elements_by_tagname(xml_geometry, "cylinder")
         length = rbd.parse_scalar(Float32, xml_cylinder, "length")
         radius = rbd.parse_scalar(Float32, xml_cylinder, "radius")
@@ -37,43 +35,40 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
     end
     for xml_mesh in get_elements_by_tagname(xml_geometry, "mesh")
         filename = attribute(xml_mesh, "filename")
-        dae_pattern = r".dae$"
-        replaced_extension_with_obj = false
-        if occursin(dae_pattern, filename)
-            filename = replace(filename, dae_pattern => ".obj")
-            replaced_extension_with_obj = true
-        end
         package_pattern = r"^package://"
-
         if occursin(package_pattern, filename)
             found_mesh = false
             for package_directory in package_path
-                filename_in_package = joinpath(package_directory, replace(filename, package_pattern => ""))
-                if ispath(filename_in_package)
-                    mesh = load(filename_in_package, GLUVMesh)
-                    push!(geometries, mesh)
+                basename, ext = splitext(joinpath(package_directory, replace(filename, package_pattern => "")))
+                for ext_to_try in [ext, ".obj"] # TODO: remove this once other packages are updated
+                    filename_in_package = basename * ext_to_try
+                    if isfile(filename_in_package)
+                        push!(geometries, MeshFile(filename_in_package))
+                        found_mesh = true
+                        break
+                    end
+                end
+            end
+            if !found_mesh
+                warning_message = """
+                Could not find the mesh file: $(filename). Tried substituting the following folders for the 'package://' prefix: $(package_path).
+                Also tried changing the extension to .obj.
+                """
+                @warn(warning_message)
+            end
+        else
+            basename, ext = splitext(joinpath(file_path, filename))
+            found_mesh = false
+            for ext_to_try in [ext, ".obj"] # TODO: remove this once other packages are updated
+                filename = basename * ext_to_try
+                if isfile(filename)
+                    push!(geometries, MeshFile(filename))
                     found_mesh = true
                     break
                 end
             end
             if !found_mesh
-                warning_message = "Could not find the mesh file: $(filename). I tried substituting the following folders for the 'package://' prefix: $(package_path)."
-                if replaced_extension_with_obj
-                    warning_message *= " Note that I replaced the file's original extension with .obj to try to find a mesh in a format I can actually load."
-                end
-                @warn(warning_message)
-            end
-        else
-            filename = joinpath(file_path, filename)
-            if ispath(filename)
-                mesh = load(filename)
-                push!(geometries, mesh)
-            else
-                warning_message = "Could not find the mesh file: $(filename)."
-                if replaced_extension_with_obj
-                    warning_message *= " Note that I replaced the file's original extension with .obj to try to find a mesh in a format I can actually load."
-                end
-                @warn(warning_message)
+                @warn "Could not find the mesh file: $(filename). Also tried changing the extension to .obj."
             end
         end
     end
