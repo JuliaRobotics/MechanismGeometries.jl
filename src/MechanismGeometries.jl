@@ -27,8 +27,9 @@ abstract type AbstractGeometrySource end
 
 function visual_elements(mechanism, source::AbstractGeometrySource) end
 
-struct MeshFile
+struct MeshFile{N, T}
     filename::String
+    scale::Vec{N, T}
 end
 
 const GeometryLike = Union{AbstractGeometry, AbstractMesh, MeshFile}
