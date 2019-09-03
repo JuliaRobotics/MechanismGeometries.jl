@@ -183,6 +183,19 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
                 end
             end
         end
+
+        @testset "anymal" begin
+            # The main reason for testing this URDF is that it has `scale` tags for the meshes.
+            urdf = "urdf/anymal_dummy_meshes.urdf"
+            robot = parse_urdf(urdf, remove_fixed_tree_joints=false)
+            elements = visual_elements(robot, URDFVisuals(urdf; package_path=["urdf"]))
+            @test length(elements) == 17
+            for element in elements
+                _, s, _ = svd(element.transform.linear)
+                expected_scale = 1e-3
+                @test all(x -> isapprox(x, expected_scale; atol=1e-10), s)
+            end
+        end
     end
 
     @testset "valkyrie" begin
