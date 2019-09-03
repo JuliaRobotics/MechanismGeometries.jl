@@ -35,7 +35,6 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
     end
     for xml_mesh in get_elements_by_tagname(xml_geometry, "mesh")
         filename = attribute(xml_mesh, "filename")
-        scale = Vec{3, Float32}(rbd.parse_vector(Float32, xml_mesh, "scale", "1 1 1"))
         package_pattern = r"^package://"
         if occursin(package_pattern, filename)
             found_mesh = false
@@ -44,7 +43,7 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
                 for ext_to_try in [ext, ".obj"] # TODO: remove this once other packages are updated
                     filename_in_package = basename * ext_to_try
                     if isfile(filename_in_package)
-                        push!(geometries, MeshFile(filename_in_package, scale))
+                        push!(geometries, MeshFile(filename_in_package))
                         found_mesh = true
                         break
                     end
@@ -63,7 +62,7 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
             for ext_to_try in [ext, ".obj"] # TODO: remove this once other packages are updated
                 filename = basename * ext_to_try
                 if isfile(filename)
-                    push!(geometries, MeshFile(filename, scale))
+                    push!(geometries, MeshFile(filename))
                     found_mesh = true
                     break
                 end
