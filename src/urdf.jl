@@ -8,33 +8,34 @@ using ColorTypes: RGBA
 using GeometryTypes
 using MechanismGeometries: GeometryLike, VisualElement, DEFAULT_COLOR, AbstractGeometrySource, HyperPlane, MeshFile
 import MechanismGeometries: visual_elements
-using CoordinateTransformations: AffineMap
+using CoordinateTransformations: AffineMap, LinearMap, Transformation
+using StaticArrays: SDiagonal
 
 export URDFVisuals
 
-function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
-    geometries = GeometryLike[]
+function parse_geometries(xml_geometry::XMLElement, package_path, frame::CartesianFrame3D, color::RGBA, tform::Transformation, file_path="")
+    elements = Vector{VisualElement}()
     for xml_cylinder in get_elements_by_tagname(xml_geometry, "cylinder")
         length = rbd.parse_scalar(Float32, xml_cylinder, "length")
         radius = rbd.parse_scalar(Float32, xml_cylinder, "radius")
         extent = Point(0, 0, length)
-        push!(geometries, Cylinder{3, Float32}(Point(0, 0, -length/2),
-                                               Point(0, 0, length/2), radius))
+        push!(elements, VisualElement(frame, Cylinder{3, Float32}(Point(0, 0, -length/2), Point(0, 0, length/2), radius), color, tform))
     end
     for xml_box in get_elements_by_tagname(xml_geometry, "box")
         size = Vec{3, Float32}(rbd.parse_vector(Float32, xml_box, "size", "0 0 0"))
-        push!(geometries, HyperRectangle(-size / 2, size))
+        push!(elements, VisualElement(frame, HyperRectangle(-size / 2, size), color, tform))
     end
     for xml_sphere in get_elements_by_tagname(xml_geometry, "sphere")
         radius = rbd.parse_scalar(Float32, xml_sphere, "radius")
-        push!(geometries, HyperSphere(zero(Point{3, Float32}), radius))
+        push!(elements, VisualElement(frame, HyperSphere(zero(Point{3, Float32}), radius), color, tform))
     end
     for xml_plane in get_elements_by_tagname(xml_geometry, "plane")
         normal = Vec{3, Float32}(rbd.parse_vector(Float32, xml_plane, "normal", "0 0 1"))
-        push!(geometries, HyperPlane(normal))
+        push!(elements, VisualElement(frame, HyperPlane(normal), color, tform))
     end
     for xml_mesh in get_elements_by_tagname(xml_geometry, "mesh")
         filename = attribute(xml_mesh, "filename")
+        scale = Vec{3, Float32}(rbd.parse_vector(Float32, xml_mesh, "scale", "1 1 1"))
         package_pattern = r"^package://"
         if occursin(package_pattern, filename)
             found_mesh = false
@@ -43,7 +44,7 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
                 for ext_to_try in [ext, ".obj"] # TODO: remove this once other packages are updated
                     filename_in_package = basename * ext_to_try
                     if isfile(filename_in_package)
-                        push!(geometries, MeshFile(filename_in_package))
+                        push!(elements, VisualElement(frame, MeshFile(filename_in_package), color, tform ∘ LinearMap(SDiagonal(scale))))
                         found_mesh = true
                         break
                     end
@@ -62,7 +63,7 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
             for ext_to_try in [ext, ".obj"] # TODO: remove this once other packages are updated
                 filename = basename * ext_to_try
                 if isfile(filename)
-                    push!(geometries, MeshFile(filename))
+                    push!(elements, VisualElement(frame, MeshFile(filename), color, tform ∘ LinearMap(SDiagonal(scale))))
                     found_mesh = true
                     break
                 end
@@ -72,7 +73,7 @@ function parse_geometries(xml_geometry::XMLElement, package_path, file_path="")
             end
         end
     end
-    geometries
+    elements
 end
 
 function parse_material!(material_colors::Dict{String, RGBA{Float32}}, xml_material)
@@ -88,9 +89,9 @@ function parse_material!(material_colors::Dict{String, RGBA{Float32}}, xml_mater
     get(material_colors, name, DEFAULT_COLOR)
 end
 
-function parse_link!(material_colors::Dict, xml_link,
+function parse_link!(material_colors::Dict, xml_link, frame::CartesianFrame3D,
                      package_path=ros_package_path(), file_path="", tag="visual", link_colors=Dict{String, RGBA{Float32}}())
-    ret = []
+    elements = Vector{VisualElement}()
     xml_visuals = get_elements_by_tagname(xml_link, tag)
     for xml_visual in xml_visuals
         xml_material = find_element(xml_visual, tag)
@@ -98,11 +99,9 @@ function parse_link!(material_colors::Dict, xml_link,
         color = get(link_colors, linkname, parse_material!(material_colors, find_element(xml_visual, "material")))
         rot, trans = rbd.parse_pose(Float64, find_element(xml_visual, "origin"))
         tform = AffineMap(rot, trans)
-        for geometry in parse_geometries(find_element(xml_visual, "geometry"), package_path, file_path)
-            push!(ret, (geometry, color, tform))
-        end
+        append!(elements, parse_geometries(find_element(xml_visual, "geometry"), package_path, frame, color, tform, file_path))
     end
-    ret
+    elements
 end
 
 function create_graph(xml_links, xml_joints)
@@ -171,9 +170,7 @@ function visual_elements(mechanism::Mechanism, source::URDFVisuals)
         end
         if haskey(name_to_frame, framename)
             body_frame = name_to_frame[framename]
-            for (geometry, color, tform) in parse_link!(material_colors, xml_link, source.package_path, source.file_path, source.tag, source.link_colors)
-                push!(elements, VisualElement(body_frame, geometry, color, tform))
-            end
+            append!(elements, parse_link!(material_colors, xml_link, body_frame, source.package_path, source.file_path, source.tag, source.link_colors))
         end
     end
     elements
