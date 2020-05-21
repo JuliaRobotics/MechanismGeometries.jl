@@ -4,26 +4,15 @@ os:
   - linux
 julia:
   - 1.0
-  - 1.1
+  - 1.4
   - nightly
 notifications:
   email: false
-git:
-  depth: 99999999
+branches:
+  only:
+    - master
+    - /^v[0-9]+\.[0-9]+\.[0-9]+$/ # version tags
 matrix:
  allow_failures:
- - julia: nightly
-## uncomment and modify the following lines to manually install system packages
-#addons:
-#  apt: # apt-get for linux
-#    packages:
-#    - gfortran
-#before_script: # homebrew for mac
-#  - if [ $TRAVIS_OS_NAME = osx ]; then brew install gcc; fi
-## uncomment the following lines to override the default test script
-#script:
-#  - julia -e 'import Pkg; Pkg.clone(pwd()); Pkg.build("MechanismGeometries"); Pkg.test("MechanismGeometries"; coverage=true)'
 after_success:
-  - if [[ $TRAVIS_JULIA_VERSION = 1.1 ]]; then
-      julia --project -e 'using Pkg; pkg"add Coverage"; using Coverage; Codecov.submit(Codecov.process_folder())';
-    fi
+  - julia -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
