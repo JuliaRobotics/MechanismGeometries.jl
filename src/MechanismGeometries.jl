@@ -3,7 +3,7 @@ VERSION < v"0.7.0-beta2.199" && __precompile__()
 module MechanismGeometries
 
 using LinearAlgebra
-using GeometryTypes
+using GeometryBasics
 using StaticArrays
 using RigidBodyDynamics
 using ColorTypes: RGBA

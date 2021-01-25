@@ -5,7 +5,7 @@ using RigidBodyDynamics
 using RigidBodyDynamics.Graphs
 const rbd = RigidBodyDynamics
 using ColorTypes: RGBA
-using GeometryTypes
+using GeometryBasics
 using MechanismGeometries: GeometryLike, VisualElement, DEFAULT_COLOR, AbstractGeometrySource, HyperPlane, MeshFile
 import MechanismGeometries: visual_elements
 using CoordinateTransformations: AffineMap, LinearMap, Transformation
@@ -23,7 +23,7 @@ function parse_geometries(xml_geometry::XMLElement, package_path, frame::Cartesi
     end
     for xml_box in get_elements_by_tagname(xml_geometry, "box")
         size = Vec{3, Float32}(rbd.parse_vector(Float32, xml_box, "size", "0 0 0"))
-        push!(elements, VisualElement(frame, HyperRectangle(-size / 2, size), color, tform))
+        push!(elements, VisualElement(frame, Rect(-size / 2, size), color, tform))
     end
     for xml_sphere in get_elements_by_tagname(xml_geometry, "sphere")
         radius = rbd.parse_scalar(Float32, xml_sphere, "radius")

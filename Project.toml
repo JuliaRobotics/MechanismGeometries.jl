@@ -1,11 +1,11 @@
 name = "MechanismGeometries"
 uuid = "931e9471-e8fb-5385-a477-07ad12718aca"
-version = "0.5.0"
+version = "0.6.0"
 
 [deps]
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
-GeometryTypes = "4d00f742-c7ba-57c2-abde-4428a4b178cb"
+GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
 LightXML = "9c8b4983-aa76-5018-a973-4c85ecc9e179"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 RigidBodyDynamics = "366cf18f-59d5-5db9-a4de-86a9f6786172"
@@ -15,7 +15,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 [compat]
 ColorTypes = "0.7, 0.8, 0.9, 0.10"
 CoordinateTransformations = "0.6"
-GeometryTypes = "0.6, 0.7"
+GeometryBasics = "0.2, 0.3"
 LightXML = "0.8, 0.9"
 RigidBodyDynamics = "2"
 Rotations = "1"
