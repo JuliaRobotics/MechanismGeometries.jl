@@ -16,7 +16,7 @@ visual_elements(mechanism::Mechanism, source::AbstractGeometrySource)
 `visual_elements` returns a vector of `VisualElement` structs, each of which contains:
 
 * `frame`: A `CartesianFrame3D` indicating where the geometry is attached in the mechanism
-* `geometry`: One of the [GeometryTypes.jl](https://github.com/JuliaGeometry/GeometryTypes.jl) types
+* `geometry`: One of the [GeometryBasics.jl](https://github.com/JuliaGeometry/GeometryBasics.jl) types
 * `color`: an RGBA color from [ColorTypes.jl](https://github.com/JuliaGraphics/ColorTypes.jl)
 * `transform`: a `Transformation` from [CoordinateTransformations.jl](https://github.com/FugroRoames/CoordinateTransformations.jl/) indicating the pose of the geometry w.r.t its attached frame.
 

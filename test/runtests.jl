@@ -1,7 +1,7 @@
 using MechanismGeometries
 using RigidBodyDynamics
 const rbd = RigidBodyDynamics
-using GeometryTypes
+using GeometryBasics
 using StaticArrays: SVector, SDiagonal
 using CoordinateTransformations: AffineMap, IdentityTransformation, LinearMap, Translation, transform_deriv
 using ColorTypes: RGBA, BGR
@@ -79,7 +79,7 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
 
             element = elements[1]
             @test string(rbd.body_fixed_frame_to_body(robot, element.frame)) == "base_link"
-            @test element.geometry isa HyperRectangle
+            @test element.geometry isa Rect
             @test element.geometry.origin ≈ [-0.1, -0.1, -0.1]
             @test element.geometry.widths ≈ [0.2, 0.2, 0.2]
             @test element.color == RGBA(0, 1, 0, 1)
@@ -113,7 +113,7 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
 
             element = elements[1]
             @test string(rbd.body_fixed_frame_to_body(robot, element.frame)) == "world"
-            @test element.geometry isa HyperRectangle
+            @test element.geometry isa Rect
             @test element.geometry.origin ≈ [-0.1, -0.1, -0.1]
             @test element.geometry.widths ≈ [0.2, 0.2, 0.2]
             @test element.color == RGBA(0, 1, 0, 1)
@@ -154,7 +154,7 @@ homog(t::Translation) = homog(AffineMap(Matrix(1.0I, 3, 3), t(SVector(0., 0., 0.
             elements = visual_elements(robot, URDFVisuals(urdf; tag="collision"))
             @test length(elements) == 2
             @test elements[1].frame === elements[2].frame
-            @test elements[1].geometry isa HyperRectangle
+            @test elements[1].geometry isa Rect
             @test elements[2].geometry isa HyperPlane
             @test elements[2].geometry.normal == Vec(0., 0, 1)
             @test homog(elements[2].transform) ≈ homog(Translation(0, 0, 0.025))

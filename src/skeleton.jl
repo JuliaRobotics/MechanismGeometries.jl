@@ -76,7 +76,7 @@ function create_frame_to_frame_geometry(joint_to_joint, radius)
     else
         IdentityTransformation()
     end
-    geometry = HyperRectangle(Vec(0, -radius, -radius), Vec(geom_length, 2*radius, 2*radius))
+    geometry = Rect(Vec(0, -radius, -radius), Vec(geom_length, 2*radius, 2*radius))
     return VisualElement(joint_to_joint.to, geometry, DEFAULT_COLOR, tform)
 end
 
