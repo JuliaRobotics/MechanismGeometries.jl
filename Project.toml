@@ -13,9 +13,9 @@ Rotations = "6038ab10-8711-5258-84ad-4b1120ba62dc"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
-ColorTypes = "0.7, 0.8, 0.9, 0.10"
+ColorTypes = "0.7, 0.8, 0.9, 0.10, 0.11"
 CoordinateTransformations = "0.6"
-GeometryBasics = "0.2, 0.3"
+GeometryBasics = "0.2, 0.3, 0.4"
 LightXML = "0.8, 0.9"
 RigidBodyDynamics = "2.3"
 Rotations = "1"
