@@ -19,7 +19,7 @@ function parse_geometries(xml_geometry::XMLElement, package_path, frame::Cartesi
         length = rbd.parse_scalar(Float32, xml_cylinder, "length")
         radius = rbd.parse_scalar(Float32, xml_cylinder, "radius")
         extent = Point(0, 0, length)
-        push!(elements, VisualElement(frame, Cylinder{3, Float32}(Point(0, 0, -length/2), Point(0, 0, length/2), radius), color, tform))
+        push!(elements, VisualElement(frame, Cylinder{Float32}(Point(0, 0, -length/2), Point(0, 0, length/2), radius), color, tform))
     end
     for xml_box in get_elements_by_tagname(xml_geometry, "box")
         size = Vec{3, Float32}(rbd.parse_vector(Float32, xml_box, "size", "0 0 0"))
